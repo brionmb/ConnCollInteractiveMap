@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="d3/d3.js"></script>
+       <!-- <img src="http://www.conncoll.edu/CAT/sym2014/images/campus_map.jpg" alt="conn pic" style="style="width:304px;height:228px;""> -->
+       	<style type="text/css">
+		
+			div.bar {
+				display: inline-block;
+				width: 20px;
+				height: 200px;
+				background-color: teal;
+				margin-right: 5px;
+				color: white;
+				font: 10px sans-serif;
+				text-align: right;
+				padding: 3px;
+				margin: 1px;
+				
+				
+			}
+			
+			.thing
+			{
+				fill: yellow;
+   			    stroke: orange;
+    			stroke-width: 15;
+    		
+			
+				}
+		
+		</style>
+       <svg width="1500" height="2000">
+  <circle cx="40" cy="350" r="10" class="thing"></circle>
+  <circle cx="80" cy="350" r="10" class="thing"></circle>
+  <circle cx="120" cy="350" r="10" class="thing"></circle>
+  
+</svg>
+    </head>
+    <body>
+        <script type="text/javascript">
+        var dataset = [ 7, 10, 15, 20, 25 ];
+
+        
+		//var svg= d3.select("body").selectAll("div")
+   		// .data(dataset)
+    	//	.enter()
+    	///	.append("div")
+    		// .attr("class","bar")
+    		// .style("height",function(d)
+    		// {return d*15 +"px";}).text(function(d){return d;});
+    		 var x=1;
+    		 var y=2;
+    		 var one=25;
+    		 var listColor=["yellow","blue","orange","green","red","aliceblue","aqua","lightsalmon",
+    		 "azure","lime","magenta","cornsilk","navy","darkred","palevioletred","pink","dodgerblue",
+    		 "gold","snow","ivory","lavendar"];
+    		 var words=["hello","my","name"];
+    	 	 var dasCircles = d3.selectAll("circle");
+    	 	// var dasCircleArray =dasCircles.pop();
+    	 	 var clicked=1;
+    	 	 var timerId=0;
+    	 	 var mousePoint=[0,0];
+    	 	 dasCircles.on("click",choose);
+    	 	 d3.select("body").on("click",move);
+    	 	 function move()
+    	 	 {
+    	 	 	
+    	 	   mousePoint=d3.mouse(this);
+    	 	   var ranNumb=Math.floor(Math.random()*3+1);
+    	 	   var thisCircle= d3.select("circle:nth-of-type("+ ranNumb +")");	
+    	 	   thisCircle.attr("cx",mousePoint[0]);
+    	 	   thisCircle.attr("cy",mousePoint[1]);
+    	 	 
+    	 	 }
+    	 	 
+    	 	 function choose()
+    	 	 {
+    	 	   if(clicked==1)
+    	 	    timerId=setInterval(act,300);
+    	 	   else
+    	 	   stopAct();
+    	 	 
+    	 	 }
+    		 function act()
+    		 {
+    		 clicked=0;
+    		 var circle =d3.selectAll("circle");
+    		 circle.attr("r",one);
+    		 if(one<350)
+    		 one=one+10;
+    		 else
+    		 one=one-299;
+    		//setInterval( circle.attr("r",one),2500);
+    		//window.setInterval(function(){
+    		 circle.attr("cx", function() { return Math.random() * 1500; });
+    		 	 var ranInt = Math.floor(Math.random()*5);
+    		 	 var ranInt2 = Math.floor(Math.random()*5);
+    		 var circleOne=d3.select("circle:nth-of-type(1)");
+    		 circleOne.style("fill",listColor[Math.floor(Math.random()*21)]);
+    		 circleOne.style("stroke",listColor[Math.floor(Math.random()*21)]);
+    		 var circleTwo=d3.select("circle:nth-of-type(2)");
+    		 circleTwo.style("fill",listColor[Math.floor(Math.random()*21)]);
+    		 circleTwo.style("stroke",listColor[Math.floor(Math.random()*21)]);
+    		 var circleThree=d3.select("circle:nth-of-type(3)");
+    		 circleThree.style("fill",listColor[Math.floor(Math.random()*21)]);
+    		 circleThree.style("stroke",listColor[Math.floor(Math.random()*21)]);
+
+
+    		 //circle.style("fill",listColor[ranInt]);
+    		// circle.style("stroke",listColor[ranInt2]);
+    	//	 },2500);
+    		}
+    		
+    		function stopAct()
+    		{
+    		 clicked=1;
+    		 clearInterval(timerId);
+    		
+    		
+    		}
+    		
+    		//setInterval(act,200);
+    		
+    		
+    		
+    		/** var two=2;
+    		 var three=3;
+    		 var datas=[one,two,three];
+    		var svg=d3.select("svg");
+    		var circle=svg.selectAll("circle").data(datas);
+    		var circleEnter=circle.enter().append("circle");
+    		circleEnter.attr("cy",70);
+    		circleEnter.attr("cx",90);
+    		circleEnter.attr("r",function(d){return d;});
+    		/** while(x!=y)
+    		 {
+    		 	one=one+1;
+    		 	two=two+2;
+    		 	three=three+3;
+    		 		circleEnter.attr("r",function(d){return d;});
+    		 
+    		 
+    		 }*/
+    		 
+
+            
+            
+    
+        </script>
+    </body>
+</html>
