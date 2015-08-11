@@ -97,16 +97,28 @@
 
     </head>
     <body>
-    <script type="text/javascript" src="student.js"></script>     
+    <script type="text/javascript" src="student.js"></script>   
+    <script type="text/javascript" src="buildingNode.js"></script>
+    <script type="text/javascript" src="buildingHashList.js"></script>  
       <script type="text/javascript">
+      var buildingList= new BuildingHashList();
+      buildingList.addElement(new buildingNode("ja",1,2));
+     var svg = d3.select('svg');
+      var myCircle = svg.append('circle')
+            .attr('cx', 50)
+            .attr('cy', 50)
+            .attr('r', 10)
+            .attr('fill',"yellow");
+    
       var allBuilding = d3.selectAll("rect, ellipse")[0];
       console.log(allBuilding);
+      
       var svg = d3.select("svg");
 
       for (var i = 0; i < allBuilding.length; ++i) {
 
         var building = d3.select(allBuilding[i]);
-        console.log(building);
+        
 
         var text = svg.append("text")
               .attr("text-anchor", "middle")
@@ -119,11 +131,12 @@
 
           var midX = parseInt(building.attr("x")) + parseInt(building.attr("width")) / 2;
           var midY = parseInt(building.attr("y")) + parseInt(building.attr("height")) / 2;
-
+		  buildingList.addElement(new buildingNode(building.attr("id"),midX,midY));
           text.attr("x", midX)
               .attr("y", midY);
 
         } else {
+          buildingList.addElement(new buildingNode(building.attr("id"),building.attr("cx"),building.attr("cy")));
           text.attr("x", building.attr("cx"))
               .attr("y", building.attr("cy"));
         }      
@@ -223,10 +236,22 @@
       console.log(adj_map);
       
       console.log("HELOO");
-      var classes=[["Class101","one","three"],"two","three","four","five","six","seven"];
+      console.log(buildingList.returnElementBy("Gym"));
+      var classes=["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"];
       var stu1=new Student(classes, "harkness", "yes", "JA");
-      stu1.addNewItinerary("five");
+      //stu1.addNewItinerary("five");
       console.log(stu1.getFullItinerary());
+      myCircle.on("click", function () {	
+      		console.log("hey");	  
+			//console.log(stu1.getNextClass());
+            
+           var classOne =buildingList.returnElementBy(stu1.getNextClass());
+            myCircle
+              .transition()
+              .attr("cx", classOne.getLocationX())
+              .attr("cy", classOne.getLocationY())
+              .duration(2000);
+          });
       </script>
 
     </body>

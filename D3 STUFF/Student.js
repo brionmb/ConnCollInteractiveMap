@@ -51,7 +51,7 @@
  }
  
 
- scope.addNewItinerary("four");
+ //scope.addNewItinerary("four");
  console.log(schedule);
 
 }
