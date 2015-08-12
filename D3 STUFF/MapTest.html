@@ -135,6 +135,7 @@
           text.attr("x", midX)
               .attr("y", midY);
 
+
         } else {
           buildingList.addElement(new buildingNode(building.attr("id"),building.attr("cx"),building.attr("cy")));
           text.attr("x", building.attr("cx"))
@@ -143,7 +144,7 @@
       }
 
       //each node represents a point of intersection
-        var nodes = [
+      var nodes = [
             [0, [40, 65]], [1, [150, 65]], [2, [285, 65]], [3, [445, 65]], [4, [570, 65]], [5, [625, 65]], [6, [850, 65]], [7, [1075, 65]], // horizontal road 0
             [8, [150, 135]], [9, [285, 135]], [10, [445, 135]], [11, [570, 135]], [12, [625, 135]], [13, [740, 135]], [14, [1075, 135]], // horizontal road 1
             [15, [40, 240]], [16, [90, 240]], [17, [225, 240]], [18, [315, 240]], [19, [405, 240]], [20, [505, 240]], [21, [570, 240]], [22, [625, 240]], [23, [725, 240]], [24, [820, 240]], [25, [900, 240]], [26, [995, 240]], [27, [1075, 240]], // horizontal road 2
@@ -241,6 +242,7 @@
       var stu1=new Student(classes, "harkness", "yes", "JA");
       //stu1.addNewItinerary("five");
       console.log(stu1.getFullItinerary());
+
       myCircle.on("click", function () {	
       		console.log("hey");	  
 			//console.log(stu1.getNextClass());
@@ -252,6 +254,57 @@
               .attr("cy", classOne.getLocationY())
               .duration(2000);
           });
+
+
+
+      var last_location = 0;
+      var dest_location = last_location;
+      var orig_location = last_location;
+
+      var orig_nodes = nodes[last_location][1];
+      var dest_nodes = nodes[dest_location][1];
+
+      var svg = d3.select('svg');
+      var myCircle = svg.append('circle')
+            .attr('cx', orig_nodes[0])
+            .attr('cy', orig_nodes[1])
+            .attr('r', 10)
+            .attr('fill',"yellow");
+
+      function move_random() {  
+
+        var possible = [];
+
+        for (var i = 0; i < adj_map[last_location].length; i++){
+          if (adj_map[last_location][i] != Infinity) {
+            if (i != orig_location) {
+              possible.push(i);
+            }
+          }
+        }
+
+        if (possible.length == 0){
+          possible.push(orig_location);
+        }
+
+        dest_location = possible[Math.floor(Math.random()*possible.length)]
+        dest_nodes = nodes[dest_location][1];
+
+        myCircle
+          .transition()
+          .ease("linear")
+          .attr("cx", dest_nodes[0])
+          .attr("cy", dest_nodes[1])
+          .duration(adj_map[last_location][dest_location] * 8)
+          .each("end", move_random);
+
+        orig_location = last_location;
+        last_location = dest_location;
+      };
+
+      setTimeout(move_random, 1000);
+
+
       </script>
 
     </body>
