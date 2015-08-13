@@ -116,7 +116,6 @@
             ret.x = parseInt(d3obj.attr("x")) + parseInt(d3obj.attr("width")) / 2;
             ret.y = parseInt(d3obj.attr("y")) + parseInt(d3obj.attr("height")) / 2;
           }
-
           return ret;
       }
 
@@ -155,7 +154,7 @@
 
           var midX = parseInt(building.attr("x")) + parseInt(building.attr("width")) / 2;
           var midY = parseInt(building.attr("y")) + parseInt(building.attr("height")) / 2;
-    		  buildingList.addElement(new buildingNode(building.attr("id"),midX,midY));
+          buildingList.addElement(new buildingNode(building.attr("id"),midX,midY));
           buildingName.attr("x", midX)
                       .attr("y", midY);
         } 
@@ -172,148 +171,218 @@
             [0, [40, 65]], [1, [150, 65]], [2, [285, 65]], [3, [445, 65]], [4, [570, 65]], [5, [625, 65]], [6, [850, 65]], [7, [1075, 65]], // horizontal road 0
             [8, [150, 135]], [9, [285, 135]], [10, [445, 135]], [11, [570, 135]], [12, [625, 135]], [13, [740, 135]], [14, [920, 135]], [15, [1075, 135]], // horizontal road 1
             [16, [40, 240]], [17, [90, 240]], [18, [225, 240]], [19, [315, 240]], [20, [405, 240]], [21, [505, 240]], [22, [570, 240]], [23, [625, 240]], [24, [725, 240]], [25, [820, 240]], [26, [920, 240]], [27, [1075, 240]], // horizontal road 2
-            [28, [40, 380]], [29, [90, 380]], [30, [225, 380]], [31, [315, 380]], [32, [405, 380]], [33, [505, 380]], [34, [570, 380]], [35, [625, 380]], [36, [770, 380]], [37, [820, 380]], [38, [960, 380]], [39, [1075, 380]], // horizontal road 3
+            [28, [40, 380]], [29, [90, 380]], [30, [225, 380]], [31, [315, 380]], [32, [405, 380]], [33, [505, 380]], [34, [570, 380]], [35, [625, 380]], [36, [725, 380]], [37, [820, 380]], [38, [960, 380]], [39, [1075, 380]], // horizontal road 3
             [40, [830, 490]] // lone node
-          ]
+      ]
 
-        //print out points of intersection
-        for (var i =0; i < nodes.length; i++){
-          svg.append("text")
-            .text(i)
-            .attr("x", nodes[i][1][0])
-            .attr("y", nodes[i][1][1]);
-        }
+      //print out points of intersection
+      for (var i =0; i < nodes.length; i++){
+        svg.append("text")
+          .text(i)
+          .attr("x", nodes[i][1][0])
+          .attr("y", nodes[i][1][1]);
+      }
+
+      var building_to_nodes = [
+      [23], //0
+      [24,36], //1
+      [25], //2
+      [25,37], //3
+      [35], //4
+      [26], //5
+      [26,38], //6
+      [5,12], //7
+      [6], //8
+      [15,27], //9
+      [1,8], //10
+      [8], //11
+      [2,9], //12
+      [3,10], //13
+      [35], //14
+      [36,37], //15
+      [13,24], //16
+      [12,23], //17
+      [17,29], //18
+      [18,30], //19
+      [19,31], //20
+      [20,32], //21
+      [21,33], //22
+      [33], //23 
+      [4,5], //24
+      [14,26], //25
+      [13], //26
+      [40], // 27
+      [40], // 28
+      [40], // 29
+      [40], // 30
+      [40], // 31
+      ]
         
-        var z = Infinity;
+      var z = Infinity;
 
-        //adjacency matrix defining the graph
-        //1 means two nodes are connected, z means inconnected
-        var adj_map = [
-        // 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
-          [z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 0
-          [1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 1
-          [z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 2
-          [z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 3
-          [z, z, z, 1, z, 1, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 4
-          [z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 5
-          [z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 6
-          [z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 7
-          [z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 8
-          [z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 9
-          [z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 10
-          [z, z, z, z, 1, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 11
-          [z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 12
-          [z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 13
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 14
-          [z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 15
-          [1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z ], // 16
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 17
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 18
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 19
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 20
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 21
-          [z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z ], // 22
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 23
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 24
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 25
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 26
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, 1, z ], // 27
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z ], // 28
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z ], // 29
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z ], // 30
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z ], // 31
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z ], // 32
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z ], // 33
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z ], // 34
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z ], // 35
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z ], // 36
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z ], // 37
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, 1 ], // 38
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z ], // 39
-          [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z ], // 40
-        ]
+      //adjacency matrix defining the graph
+      //1 means two nodes are connected, z means inconnected
+      var adj_map = [
+      // 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+        [z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 0
+        [1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 1
+        [z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 2
+        [z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 3
+        [z, z, z, 1, z, 1, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 4
+        [z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 5
+        [z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 6
+        [z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 7
+        [z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 8
+        [z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 9
+        [z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 10
+        [z, z, z, z, 1, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 11
+        [z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 12
+        [z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 13
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 14
+        [z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 15
+        [1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z ], // 16
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 17
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 18
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 19
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 20
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 21
+        [z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z ], // 22
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 23
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 24
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 25
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, z ], // 26
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, 1, z ], // 27
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, z ], // 28
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z, z ], // 29
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z, z ], // 30
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z, z ], // 31
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z, z ], // 32
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z, z ], // 33
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z, z ], // 34
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z, z ], // 35
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z, z ], // 36
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, z, z ], // 37
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, 1, 1 ], // 38
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z ], // 39
+        [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z ], // 40
+      ]
 
-        //go over the matrix and check the relation between nodes
-        for (var i=0; i < adj_map.length; i++){
-          for (var s=i+1; s < adj_map[i].length; s++){
-            if (adj_map[i][s] == 1){
-              var x1 = nodes[i][1][0];
-              var y1 = nodes[i][1][1];
-              var x2 = nodes[s][1][0];
-              var y2 = nodes[s][1][1];
+      //go over the matrix and check the relation between nodes
+      for (var i=0; i < adj_map.length; i++){
+        for (var s=i+1; s < adj_map[i].length; s++){
+          if (adj_map[i][s] == 1){
+            var x1 = nodes[i][1][0];
+            var y1 = nodes[i][1][1];
+            var x2 = nodes[s][1][0];
+            var y2 = nodes[s][1][1];
 
-              //draw the path
-              svg.append("line")
-                .attr("x1", x1)
-                .attr("y1", y1)
-                .attr("x2", x2)
-                .attr("y2", y2)
-                .style("stroke","black");
+            //draw the path
+            svg.append("line")
+              .attr("x1", x1)
+              .attr("y1", y1)
+              .attr("x2", x2)
+              .attr("y2", y2)
+              .style("stroke","black");
 
-              //calculate the distance between two nodes
-              var dx = x2-x1;
-              var dy = y2-y1;
-              adj_map[i][s] = adj_map[s][i] = Math.sqrt(dx * dx + dy * dy);
-            }
+            //calculate the distance between two nodes
+            var dx = x2-x1;
+            var dy = y2-y1;
+            adj_map[i][s] = adj_map[s][i] = Math.sqrt(dx * dx + dy * dy);
           }
         }
+      }
 
       console.log(adj_map);
       
       console.log("HELOO");
       console.log(buildingList.returnElementBy("Gym"));
-      var classes=["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"];
-      var stu1=new Student(classes, "harkness", "yes", "JA");
+      var classes = ["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"];
+      var stu1 = new Student(classes, "harkness", "yes", "JA");
       //stu1.addNewItinerary("five");
       console.log(stu1.getFullItinerary());
 
 
-      var last_location = 0;
-      var dest_location = last_location;
-      var orig_location = last_location;
-
-      var orig_nodes = nodes[last_location][1];
-      var dest_nodes = nodes[dest_location][1];
-
+      var orig_building = Math.floor(Math.random() * allBuilding.length);
+      var orig_position = findMiddle(d3.select(allBuilding[orig_building]));
       var svg = d3.select('svg');
       var myCircle = svg.append('circle')
-            .attr('cx', orig_nodes[0])
-            .attr('cy', orig_nodes[1])
+            .attr('cx', orig_position.x)
+            .attr('cy', orig_position.y)
             .attr('r', 10)
             .attr('fill',"yellow");
+      moveBuilding();
 
-      function move_random() {  
+      function moveBuilding(){
+        orig_position = findMiddle(d3.select(allBuilding[orig_building]));
+        //console.log(orig_position);
 
-        var possible = [];
+        //console.log("hey");
+        var dest_building = Math.floor(Math.random() * allBuilding.length);
+        console.log("Destinated building No.", dest_building);
 
-        for (var i = 0; i < adj_map[last_location].length; i++){
-          if (adj_map[last_location][i] != Infinity) {
-            if (i != orig_location) {
-              possible.push(i);
-            }
-          }
-        }
+        var dest_position = findMiddle(d3.select(allBuilding[dest_building]));
+        var first_step = building_to_nodes[orig_building][Math.floor(Math.random() * building_to_nodes[orig_building].length)];
+        //console.log(first_step);
 
-        if (possible.length == 0){
-          possible.push(orig_location);
-        }
+        var last_location = first_step;
+        var dest_location = last_location;
+        var orig_location = last_location;
 
-        dest_location = possible[Math.floor(Math.random()*possible.length)]
-        dest_nodes = nodes[dest_location][1];
-
+        var orig_nodes = nodes[last_location][1];
+        var dest_nodes = nodes[dest_location][1];
+        
         myCircle
           .transition()
           .ease("linear")
-          .attr("cx", dest_nodes[0])
-          .attr("cy", dest_nodes[1])
-          .duration(adj_map[last_location][dest_location] * 8)
+          .attr("cx", nodes[first_step][1][0])
+          .attr("cy", nodes[first_step][1][1])
           .each("end", move_random);
 
-        orig_location = last_location;
-        last_location = dest_location;
-      };
+        function move_random() { 
+          if (building_to_nodes[dest_building].indexOf(last_location) != -1){
+            console.log( dest_position);
+            orig_building = dest_building;
+            myCircle
+              .transition()
+              .ease("linear")
+              .attr("cx", dest_position.x)
+              .attr("cy", dest_position.y)
+              .each("end", function(){
+                setTimeout(moveBuilding, 1000);
+              });
 
-      setTimeout(move_random, 1000);
+              return;
+          }
+
+          var possible = [];
+
+          for (var i = 0; i < adj_map[last_location].length; i++){
+            if (adj_map[last_location][i] != Infinity) {
+              if (i != orig_location) {
+                possible.push(i);
+              }
+            }
+          }
+
+          if (possible.length == 0){
+            possible.push(orig_location);
+          }
+
+          dest_location = possible[Math.floor(Math.random()*possible.length)]
+          dest_nodes = nodes[dest_location][1];
+
+          myCircle
+            .transition()
+            .ease("linear")
+            .attr("cx", dest_nodes[0])
+            .attr("cy", dest_nodes[1])
+            .duration(adj_map[last_location][dest_location] * 8)
+            .each("end", move_random);
+
+          orig_location = last_location;
+          last_location = dest_location;
+        };
+      }
 
 
       </script>
