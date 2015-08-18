@@ -101,21 +101,75 @@
     <script type="text/javascript" src="buildingNode.js"></script>
     <script type="text/javascript" src="buildingHashList.js"></script>  
       <script type="text/javascript">
+
       var buildingList= new BuildingHashList();
       buildingList.addElement(new buildingNode("ja",1,2));
 
+      //Dijkstra shortest path algorithm
+      //Source: http://mcc.id.au/2004/10/dijkstra.js
+      function shortestPath(edges, numVertices, startVertex) {
+        var done = new Array(numVertices);
+        done[startVertex] = true;
+        var pathLengths = new Array(numVertices);
+        var predecessors = new Array(numVertices);
+        for (var i = 0; i < numVertices; i++) {
+          pathLengths[i] = edges[startVertex][i];
+          if (edges[startVertex][i] != Infinity) {
+            predecessors[i] = startVertex;
+          }
+        }
+        pathLengths[startVertex] = 0;
+        for (var i = 0; i < numVertices - 1; i++) {
+          var closest = -1;
+          var closestDistance = Infinity;
+          for (var j = 0; j < numVertices; j++) {
+            if (!done[j] && pathLengths[j] < closestDistance) {
+              closestDistance = pathLengths[j];
+              closest = j;
+            }
+          }
+          done[closest] = true;
+          for (var j = 0; j < numVertices; j++) {
+            if (!done[j]) {
+              var possiblyCloserDistance = pathLengths[closest] + edges[closest][j];
+              if (possiblyCloserDistance < pathLengths[j]) {
+                pathLengths[j] = possiblyCloserDistance;
+                predecessors[j] = closest;
+              }
+            }
+          }
+        }
+        return { "startVertex": startVertex,
+                 "pathLengths": pathLengths,
+                 "predecessors": predecessors };
+      }
+
+      function constructPath(shortestPathInfo, endVertex) {
+        var path = [];
+        while (endVertex != shortestPathInfo.startVertex) {
+          path.unshift(endVertex);
+          endVertex = shortestPathInfo.predecessors[endVertex];
+        }
+        return path;
+      }
+
+      //find each building's middle point
       function findMiddle(d3obj) {
 
           var ret = Object();
 
+          //if the shape of building is circle or ellipse
           if (d3obj[0][0].localName == "ellipse" || d3obj[0][0].localName == "circle") {
             ret.x = parseInt(d3obj.attr("cx"));
-            ret.y = parseInt(d3obj.attr("cy"));
-
+            ret.y = parseInt (d3obj.attr("cy"));
+          //else a rectangle or square
           } else {
             ret.x = parseInt(d3obj.attr("x")) + parseInt(d3obj.attr("width")) / 2;
             ret.y = parseInt(d3obj.attr("y")) + parseInt(d3obj.attr("height")) / 2;
-          }
+          }        
+          buildingList.addElement(new buildingNode(building.attr("id"), ret.x, ret.y));
+          buildingName.attr("x", ret.x)
+          .attr("y", ret.y);
           return ret;
       }
 
@@ -149,20 +203,6 @@
 
         buildingNum.attr("x", middle.x)
                   .attr("y", middle.y + 15);
-
-        if (allBuilding[i].localName == "rect") {
-
-          var midX = parseInt(building.attr("x")) + parseInt(building.attr("width")) / 2;
-          var midY = parseInt(building.attr("y")) + parseInt(building.attr("height")) / 2;
-          buildingList.addElement(new buildingNode(building.attr("id"),midX,midY));
-          buildingName.attr("x", midX)
-                      .attr("y", midY);
-        } 
-        else {
-          buildingList.addElement(new buildingNode(building.attr("id"),building.attr("cx"),building.attr("cy")));
-          buildingName.attr("x", building.attr("cx"))
-                      .attr("y", building.attr("cy"));
-        }      
       }
 
 
@@ -183,6 +223,7 @@
           .attr("y", nodes[i][1][1]);
       }
 
+      //direct connected nodes of each building
       var building_to_nodes = [
       [23], //0
       [24,36], //1
@@ -293,6 +334,14 @@
       }
 
       console.log(adj_map);
+
+      var allPathInfo = [];
+      //compute the shortest paths from one vertex number to each other vertext in the graph 
+      for (var i=0; i < adj_map.length; i++){
+        allPathInfo[i]= shortestPath(adj_map, adj_map.length, i);
+      }
+      //get the shortest path from one vertex to another
+      console.log(allPathInfo);
       
       console.log("HELOO");
       console.log(buildingList.returnElementBy("Gym"));
@@ -301,90 +350,99 @@
       //stu1.addNewItinerary("five");
       console.log(stu1.getFullItinerary());
 
+      //create ten circle objects to move randomly at the same time
+      for(var i = 0; i < 10; i++){
+        moveCircle();
+      }
 
-      var orig_building = Math.floor(Math.random() * allBuilding.length);
-      var orig_position = findMiddle(d3.select(allBuilding[orig_building]));
-      var svg = d3.select('svg');
-      var myCircle = svg.append('circle')
-            .attr('cx', orig_position.x)
-            .attr('cy', orig_position.y)
-            .attr('r', 10)
-            .attr('fill',"yellow");
-      moveBuilding();
+      //draw the svg circle object starting at a random building and call the moveBuilding function
+      function moveCircle(){
+        //set up the color of the circle randomly
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+        var orig_building = Math.floor(Math.random() * allBuilding.length);
+        var orig_position = findMiddle(d3.select(allBuilding[orig_building]));
+        var svg = d3.select('svg');
+        var myCircle = svg.append('circle')
+              .attr('cx', orig_position.x)
+              .attr('cy', orig_position.y)
+              .attr('r', 10)
+              .attr('fill',"rgb("+r+","+g+","+b+")");
+        moveBuilding();
 
-      function moveBuilding(){
-        orig_position = findMiddle(d3.select(allBuilding[orig_building]));
-        //console.log(orig_position);
+        function moveBuilding(){
+          orig_position = findMiddle(d3.select(allBuilding[orig_building]));
+          //randomly come up another target building everytime the circle gets to the destination 
+          var dest_building;
+          do {
+            dest_building = Math.floor(Math.random() * allBuilding.length);
+          } while(dest_building == orig_building);
 
-        //console.log("hey");
-        var dest_building = Math.floor(Math.random() * allBuilding.length);
-        console.log("Destinated building No.", dest_building);
+          console.log("Destinated building No.", dest_building);
 
-        var dest_position = findMiddle(d3.select(allBuilding[dest_building]));
-        var first_step = building_to_nodes[orig_building][Math.floor(Math.random() * building_to_nodes[orig_building].length)];
-        //console.log(first_step);
+          var dest_position = findMiddle(d3.select(allBuilding[dest_building]));
 
-        var last_location = first_step;
-        var dest_location = last_location;
-        var orig_location = last_location;
-
-        var orig_nodes = nodes[last_location][1];
-        var dest_nodes = nodes[dest_location][1];
-        
-        myCircle
-          .transition()
-          .ease("linear")
-          .attr("cx", nodes[first_step][1][0])
-          .attr("cy", nodes[first_step][1][1])
-          .each("end", move_random);
-
-        function move_random() { 
-          if (building_to_nodes[dest_building].indexOf(last_location) != -1){
-            console.log( dest_position);
-            orig_building = dest_building;
-            myCircle
-              .transition()
-              .ease("linear")
-              .attr("cx", dest_position.x)
-              .attr("cy", dest_position.y)
-              .each("end", function(){
-                setTimeout(moveBuilding, 1000);
-              });
-
-              return;
-          }
-
-          var possible = [];
-
-          for (var i = 0; i < adj_map[last_location].length; i++){
-            if (adj_map[last_location][i] != Infinity) {
-              if (i != orig_location) {
-                possible.push(i);
+          var ideal_path = Object();
+          var fastest = Infinity;
+          //compute the ideal path by checking the distance of each possible route
+          for (var i=0; i < building_to_nodes[orig_building].length; i++){
+            for (var j=0; j < building_to_nodes[dest_building].length; j++){
+              var orig = building_to_nodes[orig_building][i];
+              var dest = building_to_nodes[dest_building][j];
+              var dist = allPathInfo[orig].pathLengths[dest];
+              //new route becomes the best when it is shorter than the fastest
+              if (dist < fastest){
+                fastest = dist;
+                ideal_path.orig = orig;
+                ideal_path.dest = dest;
               }
             }
           }
-
-          if (possible.length == 0){
-            possible.push(orig_location);
-          }
-
-          dest_location = possible[Math.floor(Math.random()*possible.length)]
-          dest_nodes = nodes[dest_location][1];
+          
+          var path = constructPath(allPathInfo[ideal_path.orig], ideal_path.dest);
+          console.log("The ideal path is:", path);
+          var step = 0;
+          var current = ideal_path.orig;
 
           myCircle
             .transition()
             .ease("linear")
-            .attr("cx", dest_nodes[0])
-            .attr("cy", dest_nodes[1])
-            .duration(adj_map[last_location][dest_location] * 8)
-            .each("end", move_random);
+            .attr("cx", nodes[ideal_path.orig][1][0])
+            .attr("cy", nodes[ideal_path.orig][1][1])
+            .duration(500)
+            .each("end", movePath);
 
-          orig_location = last_location;
-          last_location = dest_location;
-        };
+          function movePath() { 
+            //if the path is not finish, the circle transitions to the next node of the ideal path
+            if (step < path.length){
+              var next = path[step++];
+              myCircle
+                  .transition()
+                  .ease("linear")
+                  .attr("cx", nodes[next][1][0])
+                  .attr("cy", nodes[next][1][1])
+                  .duration(adj_map[current][next]*5)
+                  .each("end", movePath);
+              current = next;
+            }
+            //when the circle gets to the destination, reset everything and call the moveBuilding again
+            else{
+              orig_building = dest_building;
+              myCircle
+                .transition()
+                .ease("linear")
+                .attr("cx", dest_position.x)
+                .attr("cy", dest_position.y)
+                .duration(500)
+                .each("end", function(){
+                  setTimeout(moveBuilding, 1000);
+                });
+            }
+          }
+        }
       }
-
-
+ 
       </script>
 
     </body>
