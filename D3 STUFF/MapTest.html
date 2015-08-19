@@ -100,10 +100,11 @@
     <script type="text/javascript" src="student.js"></script>   
     <script type="text/javascript" src="buildingNode.js"></script>
     <script type="text/javascript" src="buildingHashList.js"></script>  
+    
       <script type="text/javascript">
 
       var buildingList= new BuildingHashList();
-      buildingList.addElement(new buildingNode("ja",1,2));
+     
 
       //Dijkstra shortest path algorithm
       //Source: http://mcc.id.au/2004/10/dijkstra.js
@@ -164,6 +165,7 @@
             ret.y = parseInt (d3obj.attr("cy"));
           //else a rectangle or square
           } else {
+          
             ret.x = parseInt(d3obj.attr("x")) + parseInt(d3obj.attr("width")) / 2;
             ret.y = parseInt(d3obj.attr("y")) + parseInt(d3obj.attr("height")) / 2;
           }        
@@ -183,7 +185,7 @@
       for (var i = 0; i < allBuilding.length; ++i) {
 
         var building = d3.select(allBuilding[i]);
-        
+        buildingList.addElement(new buildingNode(building.attr("id"),building.attr("num")));
 
         var buildingName = svg.append("text")
           .attr("text-anchor", "middle")
@@ -200,9 +202,10 @@
           });
 
         var middle = findMiddle(building);
-
+		buildingList.addElement(new buildingNode(building.attr("id"),building.attr("num")));
         buildingNum.attr("x", middle.x)
                   .attr("y", middle.y + 15);
+
       }
 
 
@@ -332,7 +335,7 @@
           }
         }
       }
-
+		
       console.log(adj_map);
 
       var allPathInfo = [];
@@ -344,7 +347,7 @@
       console.log(allPathInfo);
       
       console.log("HELOO");
-      console.log(buildingList.returnElementBy("Gym"));
+      console.log(buildingList.returnElementBy("Gym").getLocation());
       var classes = ["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"];
       var stu1 = new Student(classes, "harkness", "yes", "JA");
       //stu1.addNewItinerary("five");

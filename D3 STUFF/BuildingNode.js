@@ -1,19 +1,14 @@
-function buildingNode(buildName,buildLocationX,buildLocationY){
+function buildingNode(buildName,buildLocationNum){
 
 
 var scope = this;
 var name = buildName;
-var locationX = buildLocationX;
-var locationY = buildLocationY;
+var location = buildLocationNum;
+scope.getLocation = function()
+{
+return location;
+}
 
-scope.getLocationX = function()
-{
-return locationX;
-}
-scope.getLocationY = function()
-{
-return locationY;
-}
 scope.getName = function()
 {
 return name;
