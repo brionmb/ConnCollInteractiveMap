@@ -49,6 +49,10 @@
    
    }
  }
+ scope.getDorm =function()
+ {
+ 	return dorm;
+ }
  
 
  //scope.addNewItinerary("four");

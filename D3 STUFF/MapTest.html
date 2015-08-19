@@ -348,23 +348,46 @@
       
       console.log("HELOO");
       console.log(buildingList.returnElementBy("Gym").getLocation());
-      var classes = ["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"];
-      var stu1 = new Student(classes, "harkness", "yes", "JA");
+      var classes = ["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+      ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"];
+      var stu1 = new Student(classes, "Harkness", "yes", "JA");
       //stu1.addNewItinerary("five");
       console.log(stu1.getFullItinerary());
-
+      var stuList={};
+      stuList[0]=new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+      ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Windham", "yes", "JA");
+      stuList[1]= new Student(["JA","Plant","Plex","Chapel","Cro","Blaustein",], "Harkness", "yes", "JA");
+      stuList[2]= new Student(["Plex","Cro","Blaustein","Freeman","Gym","Health"], "Plant", "yes", "JA");
+      stuList[3]= new Student(["Plex","Chapel","JA","Windham","Cro","JA","Chapel"], "Plex", "yes", "JA");
+      stuList[4]= new Student(["Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
+      stuList[5]= new Student(["Gym","JA","Freeman","Windham","Windham","Plex","Health","Cro","Blaustein","Chapel"
+      ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "JA", "yes", "JA");
+      stuList[6]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+      ,"Gym","JA","Freeman"], "Harkness", "yes", "JA");
+      stuList[7]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+      ,"Cro","Blaustein","Chapel"], "Freeman", "yes", "JA");
+      stuList[8]= new Student(["Gym","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+      ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
+      stuList[9]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+      ,"Gym","JA","Freeman","Windham","Plex"], "Larabee", "yes", "JA");
+		for(var p=0;p<10;p++)
+		{
+		stuList[p].addNewItinerary(stuList[p].getDorm());
+		}
       //create ten circle objects to move randomly at the same time
       for(var i = 0; i < 10; i++){
-        moveCircle();
+      
+        moveCircle(i);
       }
 
       //draw the svg circle object starting at a random building and call the moveBuilding function
-      function moveCircle(){
+      function moveCircle(circleNum){
         //set up the color of the circle randomly
         var r = Math.floor(Math.random() * 256);
         var g = Math.floor(Math.random() * 256);
         var b = Math.floor(Math.random() * 256);
-        var orig_building = Math.floor(Math.random() * allBuilding.length);
+        var orig_building = buildingList.returnElementBy(stuList[circleNum].getDorm()).getLocation()
+        console.log(buildingList.returnElementBy(stuList[circleNum].getDorm()).getLocation());
         var orig_position = findMiddle(d3.select(allBuilding[orig_building]));
         var svg = d3.select('svg');
         var myCircle = svg.append('circle')
@@ -372,18 +395,21 @@
               .attr('cy', orig_position.y)
               .attr('r', 10)
               .attr('fill',"rgb("+r+","+g+","+b+")");
+        
         moveBuilding();
 
         function moveBuilding(){
           orig_position = findMiddle(d3.select(allBuilding[orig_building]));
           //randomly come up another target building everytime the circle gets to the destination 
-          var dest_building;
-          do {
-            dest_building = Math.floor(Math.random() * allBuilding.length);
-          } while(dest_building == orig_building);
+          //var dest_building;
+          //do {
+            //dest_building = Math.floor(Math.random() * allBuilding.length);
+          //} while(dest_building == orig_building);
 
           console.log("Destinated building No.", dest_building);
-
+          console.log(circleNum);
+		 var dest_building= buildingList.returnElementBy(stuList[circleNum].getNextClass()).getLocation();
+		 //console.log(nextClass);
           var dest_position = findMiddle(d3.select(allBuilding[dest_building]));
 
           var ideal_path = Object();
@@ -407,7 +433,8 @@
           console.log("The ideal path is:", path);
           var step = 0;
           var current = ideal_path.orig;
-
+			console.log("MY CIRCLE:");
+			console.log(myCircle);
           myCircle
             .transition()
             .ease("linear")
