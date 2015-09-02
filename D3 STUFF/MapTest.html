@@ -100,11 +100,9 @@
     <script type="text/javascript" src="student.js"></script>   
     <script type="text/javascript" src="buildingNode.js"></script>
     <script type="text/javascript" src="buildingHashList.js"></script>  
-    
       <script type="text/javascript">
 
       var buildingList= new BuildingHashList();
-     
 
       //Dijkstra shortest path algorithm
       //Source: http://mcc.id.au/2004/10/dijkstra.js
@@ -165,13 +163,9 @@
             ret.y = parseInt (d3obj.attr("cy"));
           //else a rectangle or square
           } else {
-          
             ret.x = parseInt(d3obj.attr("x")) + parseInt(d3obj.attr("width")) / 2;
             ret.y = parseInt(d3obj.attr("y")) + parseInt(d3obj.attr("height")) / 2;
-          }        
-          buildingList.addElement(new buildingNode(building.attr("id"), ret.x, ret.y));
-          buildingName.attr("x", ret.x)
-          .attr("y", ret.y);
+          }
           return ret;
       }
 
@@ -185,11 +179,14 @@
       for (var i = 0; i < allBuilding.length; ++i) {
 
         var building = d3.select(allBuilding[i]);
-        buildingList.addElement(new buildingNode(building.attr("id"),building.attr("num")));
+        
+        var middle = findMiddle(building);
 
         var buildingName = svg.append("text")
           .attr("text-anchor", "middle")
           .attr("fill", "white")
+          .attr("x", middle.x)
+          .attr("y", middle.y)
           .text(function(){
             return (building.attr("id"));
           });
@@ -201,10 +198,16 @@
             return (building.attr("num"));
           });
 
-        var middle = findMiddle(building);
-		buildingList.addElement(new buildingNode(building.attr("id"),building.attr("num")));
-        buildingNum.attr("x", middle.x)
-                  .attr("y", middle.y + 15);
+        var buildingNum = svg.append("text")
+          .attr("text-anchor", "middle")
+          .attr("fill", "white")
+          .attr("x", middle.x)
+          .attr("y", middle.y + 15)
+          .text(function(){
+            return (building.attr("num"));
+          });
+
+        buildingList.addElement(new buildingNode(building.attr("id"), i));
 
       }
 
@@ -335,7 +338,7 @@
           }
         }
       }
-		
+    
       console.log(adj_map);
 
       var allPathInfo = [];
@@ -347,7 +350,7 @@
       console.log(allPathInfo);
       
       console.log("HELOO");
-      console.log(buildingList.returnElementBy("Gym").getLocation());
+      //console.log(buildingList.returnElementBy("Gym").getLocation());
       var classes = ["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
       ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"];
       var stu1 = new Student(classes, "Harkness", "yes", "JA");
@@ -370,10 +373,11 @@
       ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
       stuList[9]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
       ,"Gym","JA","Freeman","Windham","Plex"], "Larabee", "yes", "JA");
-		for(var p=0;p<10;p++)
-		{
-		stuList[p].addNewItinerary(stuList[p].getDorm());
-		}
+    
+    for(var p=0;p<10;p++)
+    {
+    stuList[p].addNewItinerary(stuList[p].getDorm());
+    }
       //create ten circle objects to move randomly at the same time
       for(var i = 0; i < 10; i++){
       
@@ -386,14 +390,13 @@
         var r = Math.floor(Math.random() * 256);
         var g = Math.floor(Math.random() * 256);
         var b = Math.floor(Math.random() * 256);
-        var orig_building = buildingList.returnElementBy(stuList[circleNum].getDorm()).getLocation()
-        console.log(buildingList.returnElementBy(stuList[circleNum].getDorm()).getLocation());
+        var orig_building = buildingList.returnElementBy(stuList[circleNum].getDorm()).getLocation();
         var orig_position = findMiddle(d3.select(allBuilding[orig_building]));
         var svg = d3.select('svg');
         var myCircle = svg.append('circle')
               .attr('cx', orig_position.x)
               .attr('cy', orig_position.y)
-              .attr('r', 10)
+              .attr('r', 8)
               .attr('fill',"rgb("+r+","+g+","+b+")");
         
         moveBuilding();
@@ -408,8 +411,8 @@
 
           console.log("Destinated building No.", dest_building);
           console.log(circleNum);
-		 var dest_building= buildingList.returnElementBy(stuList[circleNum].getNextClass()).getLocation();
-		 //console.log(nextClass);
+          var dest_building= buildingList.returnElementBy(stuList[circleNum].getNextClass()).getLocation();
+          //console.log(nextClass);
           var dest_position = findMiddle(d3.select(allBuilding[dest_building]));
 
           var ideal_path = Object();
@@ -433,8 +436,8 @@
           console.log("The ideal path is:", path);
           var step = 0;
           var current = ideal_path.orig;
-			console.log("MY CIRCLE:");
-			console.log(myCircle);
+          console.log("MY CIRCLE:");
+          console.log(myCircle);
           myCircle
             .transition()
             .ease("linear")
