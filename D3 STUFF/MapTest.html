@@ -374,18 +374,18 @@
       stuList[9]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
       ,"Gym","JA","Freeman","Windham","Plex"], "Larabee", "yes", "JA");
     
-    for(var p=0;p<10;p++)
-    {
-    stuList[p].addNewItinerary(stuList[p].getDorm());
-    }
+      for(var p=0; p < 10; p++) {
+        stuList[p].addNewItinerary(stuList[p].getDorm());
+      }
       //create ten circle objects to move randomly at the same time
-      for(var i = 0; i < 10; i++){
+      for(var i = 0; i < 10; i++) {
       
         moveCircle(i);
       }
 
       //draw the svg circle object starting at a random building and call the moveBuilding function
-      function moveCircle(circleNum){
+      function moveCircle(circleNum) {
+
         //set up the color of the circle randomly
         var r = Math.floor(Math.random() * 256);
         var g = Math.floor(Math.random() * 256);
@@ -396,12 +396,14 @@
         var myCircle = svg.append('circle')
               .attr('cx', orig_position.x)
               .attr('cy', orig_position.y)
-              .attr('r', 8)
+              .attr('r', 10)
               .attr('fill',"rgb("+r+","+g+","+b+")");
         
         moveBuilding();
 
         function moveBuilding(){
+
+
           orig_position = findMiddle(d3.select(allBuilding[orig_building]));
           //randomly come up another target building everytime the circle gets to the destination 
           //var dest_building;
@@ -409,14 +411,22 @@
             //dest_building = Math.floor(Math.random() * allBuilding.length);
           //} while(dest_building == orig_building);
 
+          var dest_obj = buildingList.returnElementBy(stuList[circleNum].getNextClass());
+          if (dest_obj == null) {
+
+            console.log("Student " + circleNum + " terminated");
+            return;
+          }
+
+          var dest_building = dest_obj.getLocation();
           console.log("Destinated building No.", dest_building);
-          console.log(circleNum);
-          var dest_building= buildingList.returnElementBy(stuList[circleNum].getNextClass()).getLocation();
+
           //console.log(nextClass);
           var dest_position = findMiddle(d3.select(allBuilding[dest_building]));
 
           var ideal_path = Object();
           var fastest = Infinity;
+
           //compute the ideal path by checking the distance of each possible route
           for (var i=0; i < building_to_nodes[orig_building].length; i++){
             for (var j=0; j < building_to_nodes[dest_building].length; j++){
@@ -431,6 +441,8 @@
               }
             }
           }
+
+          var delay = 25000;
           
           var path = constructPath(allPathInfo[ideal_path.orig], ideal_path.dest);
           console.log("The ideal path is:", path);
@@ -447,21 +459,27 @@
             .each("end", movePath);
 
           function movePath() { 
+
             //if the path is not finish, the circle transitions to the next node of the ideal path
             if (step < path.length){
               var next = path[step++];
+              var duration = adj_map[current][next] * 5;
+
+              delay -= duration;
+
               myCircle
                   .transition()
                   .ease("linear")
                   .attr("cx", nodes[next][1][0])
                   .attr("cy", nodes[next][1][1])
-                  .duration(adj_map[current][next]*5)
+                  .duration(duration)
                   .each("end", movePath);
               current = next;
             }
             //when the circle gets to the destination, reset everything and call the moveBuilding again
             else{
               orig_building = dest_building;
+              console.log(delay);
               myCircle
                 .transition()
                 .ease("linear")
@@ -469,7 +487,7 @@
                 .attr("cy", dest_position.y)
                 .duration(500)
                 .each("end", function(){
-                  setTimeout(moveBuilding, 1000);
+                  setTimeout(moveBuilding, delay);
                 });
             }
           }
