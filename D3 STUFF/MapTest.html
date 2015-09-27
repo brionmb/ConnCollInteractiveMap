@@ -100,7 +100,7 @@
     <script type="text/javascript" src="student.js"></script>   
     <script type="text/javascript" src="buildingNode.js"></script>
     <script type="text/javascript" src="buildingHashList.js"></script>  
-      <script type="text/javascript">
+    <script type="text/javascript">
 
       var buildingList= new BuildingHashList();
 
@@ -349,6 +349,181 @@
       //get the shortest path from one vertex to another
       console.log(allPathInfo);
       
+
+
+      var width = 1280;
+      var padding = 150;  
+
+      var svg = d3.select("body").append("svg") 
+          .attr("width", width)
+          .attr("height", 150);
+
+      var text = svg.append("text")
+          .text("00:00")
+          .attr("x", "0")
+          .attr("y", "50");
+
+      var cur_state = 0;
+      var state_tbl = ["", "Run", "Pause", "Resume"];
+
+      var ctrl = svg.append("text")
+          .attr("x", "50")
+          .attr("y", "50")
+          .text(state_tbl[cur_state])
+          .attr("cursor", "pointer")
+          .on("click", function() {
+
+            switch (cur_state) {
+            case 0: cur_state = 0; break;
+            case 1: cur_state = 2; break;
+            case 2: cur_state = 3; break;
+            case 3: cur_state = 2; break;
+            default: cur_state = 2; break;
+            }
+
+          d3.select(this).text(state_tbl[cur_state]);
+          });
+
+      for (var i = 0; i < 23 * 2 + 1; ++i) {
+
+          var y_top = 5;
+          if (i % 2) {
+              y_top = 10;
+          }
+
+          var bar_x = i * (width - padding) / (23 * 2);
+
+          svg.append("line")
+              .attr("x1", bar_x)
+              .attr("y1", y_top)
+              .attr("x2", bar_x)
+              .attr("y2", 20)
+              .style("stroke","black");
+        }
+
+        var cursor = svg.append("line")
+                .attr("x1", 0)
+                .attr("y1", 5)
+                .attr("x2", 0)
+                .attr("y2", 25)
+                .style("stroke","red")
+                .style("stroke-width", 3);
+
+        var weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+        var previous_day = null;
+
+        for (var i = 0; i < weekdays.length; ++i) {
+
+            svg.append("text")
+                .text(weekdays[i])
+                .attr("x", i * width / weekdays.length)
+                .attr("y", "80")
+                .attr("cursor", "pointer")
+                .on("click", function() {
+
+                    var d3_obj = d3.select(this);
+                    d3_obj.attr("fill", "red")
+
+                    if (previous_day != null) {
+
+                        previous_day.attr("fill", "black");
+                    }
+                    previous_day = d3_obj;
+
+                    cur_state = 1;
+                    ctrl.text(state_tbl[cur_state]);
+
+                    var interval = 1;
+
+                    var step = (width - padding) / (24 * 60);
+
+                    var xpos = 0;
+
+                    var minutes = 0;
+                    var hours = 0;
+
+                    cursor.transition()
+                        .ease("linear")
+                        .attr("x1", 0)
+                        .attr("x2", 0)
+                        .duration(interval * 500);
+
+                    moveStep();
+                    for(var p=0; p < 10; p++) {
+                      stuList[p].addNewItinerary(stuList[p].getDorm());
+                    }
+                    //create ten circle objects to move randomly at the same time
+                    for(var i = 0; i < 10; i++) {
+      
+                      moveCircle(i);
+                    } 
+
+
+                    function moveStep() {
+
+                        if (cur_state != 2) {
+                            setTimeout(moveStep, interval);
+                            return;
+                        }
+
+                        minutes++;
+
+                        if (minutes > 60) {
+                            
+                            hours++;
+                            minutes = 0;
+                        }
+
+                        var min_str = minutes;
+                        var hr_str = hours;
+
+                        if (minutes < 10) {
+                            min_str = "0" + min_str;
+                        }
+
+                        if (hours < 10) {
+                            hr_str = "0" + hr_str;
+                        }
+
+                        xpos += step;
+
+                        if (xpos > (width - padding)) {
+
+                            text.text("00:00");
+
+                            cur_state = 1;
+                            ctrl.text(state_tbl[cur_state]);
+
+                            cursor.transition()
+                                .ease("linear")
+                                .attr("x1", 0)
+                                .attr("x2", 0)
+                                .duration(interval * 500);
+
+                        } 
+                        else {
+
+                            text.text(hr_str + ":" + min_str);
+
+                            cursor.transition()
+                                .ease("linear")
+                                .attr("x1", xpos)
+                                .attr("x2", xpos)
+                                .duration(interval* 500)
+                                .each("end", function(){
+                                    setTimeout(moveStep, interval* 500);
+                                });
+
+                        }
+                    }
+
+                    console.log(d3_obj.text());
+                })
+        }
+
+        
+
       console.log("HELOO");
       //console.log(buildingList.returnElementBy("Gym").getLocation());
       var classes = ["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
@@ -373,15 +548,6 @@
       ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
       stuList[9]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
       ,"Gym","JA","Freeman","Windham","Plex"], "Larabee", "yes", "JA");
-    
-      for(var p=0; p < 10; p++) {
-        stuList[p].addNewItinerary(stuList[p].getDorm());
-      }
-      //create ten circle objects to move randomly at the same time
-      for(var i = 0; i < 10; i++) {
-      
-        moveCircle(i);
-      }
 
       //draw the svg circle object starting at a random building and call the moveBuilding function
       function moveCircle(circleNum) {
@@ -402,7 +568,6 @@
         moveBuilding();
 
         function moveBuilding(){
-
 
           orig_position = findMiddle(d3.select(allBuilding[orig_building]));
           //randomly come up another target building everytime the circle gets to the destination 
@@ -442,7 +607,7 @@
             }
           }
 
-          var delay = 25000;
+          var delay = 75000;
           
           var path = constructPath(allPathInfo[ideal_path.orig], ideal_path.dest);
           console.log("The ideal path is:", path);
@@ -455,7 +620,7 @@
             .ease("linear")
             .attr("cx", nodes[ideal_path.orig][1][0])
             .attr("cy", nodes[ideal_path.orig][1][1])
-            .duration(500)
+            .duration(300)
             .each("end", movePath);
 
           function movePath() { 
@@ -463,7 +628,7 @@
             //if the path is not finish, the circle transitions to the next node of the ideal path
             if (step < path.length){
               var next = path[step++];
-              var duration = adj_map[current][next] * 5;
+              var duration = adj_map[current][next] * 10;
 
               delay -= duration;
 
@@ -493,6 +658,7 @@
           }
         }
       }
+
  
       </script>
 
