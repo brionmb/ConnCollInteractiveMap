@@ -348,6 +348,36 @@
       }
       //get the shortest path from one vertex to another
       console.log(allPathInfo);
+
+
+      var stuList = {};
+
+      function reloadStuList() {
+      
+        stuList[0] = new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+        ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Windham", "yes", "JA");
+        stuList[1] = new Student(["JA","Plant","Plex","Chapel","Cro","Blaustein",], "Harkness", "yes", "JA");
+        stuList[2] = new Student(["Plex","Cro","Blaustein","Freeman","Gym","Health"], "Plant", "yes", "JA");
+        stuList[3] = new Student(["Plex","Chapel","JA","Windham","Cro","JA","Chapel"], "Plex", "yes", "JA");
+        stuList[4] = new Student(["Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
+        stuList[5] = new Student(["Gym","JA","Freeman","Windham","Windham","Plex","Health","Cro","Blaustein","Chapel"
+        ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "JA", "yes", "JA");
+        stuList[6] = new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+        ,"Gym","JA","Freeman"], "Harkness", "yes", "JA");
+        stuList[7] = new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+        ,"Cro","Blaustein","Chapel"], "Freeman", "yes", "JA");
+        stuList[8] = new Student(["Gym","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+        ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
+        stuList[9] = new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
+        ,"Gym","JA","Freeman","Windham","Plex"], "Larabee", "yes", "JA");
+
+      }
+
+
+
+
+      var cur_epoch = 0;
+      var speed = 1;
       
 
 
@@ -373,12 +403,24 @@
           .attr("cursor", "pointer")
           .on("click", function() {
 
+            var all_student = d3.selectAll("circle");
+
             switch (cur_state) {
-            case 0: cur_state = 0; break;
-            case 1: cur_state = 2; break;
-            case 2: cur_state = 3; break;
-            case 3: cur_state = 2; break;
-            default: cur_state = 2; break;
+            case 0:
+              cur_state = 0;
+              break;
+            case 1:
+              cur_state = 2;
+              break;
+            case 2:
+              cur_state = 3;
+              break;
+            case 3:
+              cur_state = 2;
+              break;
+            default:
+              cur_state = 2;
+              break;
             }
 
           d3.select(this).text(state_tbl[cur_state]);
@@ -447,17 +489,19 @@
                         .ease("linear")
                         .attr("x1", 0)
                         .attr("x2", 0)
-                        .duration(interval * 500);
+                        .duration(interval * 100 * speed);
 
                     moveStep();
-                    for(var p=0; p < 10; p++) {
-                      stuList[p].addNewItinerary(stuList[p].getDorm());
-                    }
+
+                    d3.selectAll("circle").remove();
+
+                    reloadStuList();
                     //create ten circle objects to move randomly at the same time
+
+                    cur_epoch = (cur_epoch + 1) % 256;
                     for(var i = 0; i < 10; i++) {
-      
-                      moveCircle(i);
-                    } 
+                      moveCircle(i, cur_epoch);
+                    }
 
 
                     function moveStep() {
@@ -499,7 +543,7 @@
                                 .ease("linear")
                                 .attr("x1", 0)
                                 .attr("x2", 0)
-                                .duration(interval * 500);
+                                .duration(interval * 100 * speed);
 
                         } 
                         else {
@@ -510,9 +554,9 @@
                                 .ease("linear")
                                 .attr("x1", xpos)
                                 .attr("x2", xpos)
-                                .duration(interval* 500)
+                                .duration(interval * 100 * speed)
                                 .each("end", function(){
-                                    setTimeout(moveStep, interval* 500);
+                                    setTimeout(moveStep, interval* 100);
                                 });
 
                         }
@@ -522,35 +566,9 @@
                 })
         }
 
-        
-
-      console.log("HELOO");
-      //console.log(buildingList.returnElementBy("Gym").getLocation());
-      var classes = ["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-      ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"];
-      var stu1 = new Student(classes, "Harkness", "yes", "JA");
-      //stu1.addNewItinerary("five");
-      console.log(stu1.getFullItinerary());
-      var stuList={};
-      stuList[0]=new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-      ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Windham", "yes", "JA");
-      stuList[1]= new Student(["JA","Plant","Plex","Chapel","Cro","Blaustein",], "Harkness", "yes", "JA");
-      stuList[2]= new Student(["Plex","Cro","Blaustein","Freeman","Gym","Health"], "Plant", "yes", "JA");
-      stuList[3]= new Student(["Plex","Chapel","JA","Windham","Cro","JA","Chapel"], "Plex", "yes", "JA");
-      stuList[4]= new Student(["Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
-      stuList[5]= new Student(["Gym","JA","Freeman","Windham","Windham","Plex","Health","Cro","Blaustein","Chapel"
-      ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "JA", "yes", "JA");
-      stuList[6]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-      ,"Gym","JA","Freeman"], "Harkness", "yes", "JA");
-      stuList[7]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-      ,"Cro","Blaustein","Chapel"], "Freeman", "yes", "JA");
-      stuList[8]= new Student(["Gym","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-      ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
-      stuList[9]= new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-      ,"Gym","JA","Freeman","Windham","Plex"], "Larabee", "yes", "JA");
 
       //draw the svg circle object starting at a random building and call the moveBuilding function
-      function moveCircle(circleNum) {
+      function moveCircle(circleNum, epoch) {
 
         //set up the color of the circle randomly
         var r = Math.floor(Math.random() * 256);
@@ -558,16 +576,77 @@
         var b = Math.floor(Math.random() * 256);
         var orig_building = buildingList.returnElementBy(stuList[circleNum].getDorm()).getLocation();
         var orig_position = findMiddle(d3.select(allBuilding[orig_building]));
-        var svg = d3.select('svg');
-        var myCircle = svg.append('circle')
-              .attr('cx', orig_position.x)
-              .attr('cy', orig_position.y)
-              .attr('r', 10)
-              .attr('fill',"rgb("+r+","+g+","+b+")");
+        var svg = d3.select("svg");
+        var myCircle = svg.append("circle")
+              .attr("cx", orig_position.x)
+              .attr("cy", orig_position.y)
+              .attr("r", 10)
+              .attr("T", 0)
+              .attr("dur", 0)
+              .attr("dx", orig_position.x)
+              .attr("dy", orig_position.y)
+              .attr("fill","rgb("+r+","+g+","+b+")");
+
+        var self_epoch = epoch;
+
+        waitForRun();
+
+
+        function waitForRun() {
+
+          if (cur_epoch != self_epoch) {
+            return;
+          }
+
+          if (cur_state != 2) {
+            setTimeout(waitForRun, 100);
+          } else {
+            monitorState();
+            moveBuilding();
+          }
+        }
+
+        var callback = null;
         
-        moveBuilding();
+        var last_state = cur_state;
+
+        function monitorState() {
+
+
+          if (cur_state == 3) {
+            myCircle.transition()
+              .duration(0);
+          } else if (last_state == 3 && cur_state == 2) {
+
+            var time_left = parseFloat(myCircle.attr("dur")) * speed * (1 - parseFloat(myCircle.attr("T")));
+            var dx = myCircle.attr("dx");
+            var dy = myCircle.attr("dy");
+
+            console.log(time_left + " " + myCircle.attr("dur") + " " + myCircle.attr("T"));
+
+            myCircle
+              .transition()
+              .ease("linear")
+              .attr("T", 1)
+              .attr("cx", dx)
+              .attr("cy", dy)
+              .duration(time_left)
+              .each("end", callback);
+
+          }
+
+
+          last_state = cur_state;
+
+          setTimeout(monitorState, 10);
+        }
+        
 
         function moveBuilding(){
+
+          if (cur_epoch != self_epoch) {
+            return;
+          }
 
           orig_position = findMiddle(d3.select(allBuilding[orig_building]));
           //randomly come up another target building everytime the circle gets to the destination 
@@ -607,7 +686,7 @@
             }
           }
 
-          var delay = 75000;
+          var delay = 15000;
           
           var path = constructPath(allPathInfo[ideal_path.orig], ideal_path.dest);
           console.log("The ideal path is:", path);
@@ -615,15 +694,41 @@
           var current = ideal_path.orig;
           console.log("MY CIRCLE:");
           console.log(myCircle);
+
+          callback = movePath;
+
+          myCircle.attr("T", 0)
+            .attr("dur", 500)
+            .attr("dx", nodes[ideal_path.orig][1][0])
+            .attr("dy", nodes[ideal_path.orig][1][1]);
           myCircle
             .transition()
             .ease("linear")
+            .attr("T", 1)
             .attr("cx", nodes[ideal_path.orig][1][0])
             .attr("cy", nodes[ideal_path.orig][1][1])
-            .duration(300)
-            .each("end", movePath);
+            .duration(300 * speed)
+            .each("end", callback);
 
-          function movePath() { 
+          function waitForNext() {
+
+            callback = moveBuilding;
+
+            myCircle.attr("T", 0)
+              .attr("dur", delay);
+            myCircle
+              .transition()
+              .ease("linear")
+              .attr("T", 1)
+              .duration(delay * speed)
+              .each("end", callback);
+          }
+
+          function movePath() {
+
+            if (cur_epoch != self_epoch) {
+              return;
+            }
 
             //if the path is not finish, the circle transitions to the next node of the ideal path
             if (step < path.length){
@@ -631,29 +736,42 @@
               var duration = adj_map[current][next] * 10;
 
               delay -= duration;
+              callback = movePath;
+
+              myCircle.attr("T", 0)
+                .attr("dur", duration)
+                .attr("dx", nodes[next][1][0])
+                .attr("dy", nodes[next][1][1]);
 
               myCircle
                   .transition()
                   .ease("linear")
+                  .attr("T", 1)
                   .attr("cx", nodes[next][1][0])
                   .attr("cy", nodes[next][1][1])
-                  .duration(duration)
-                  .each("end", movePath);
+                  .duration(duration * speed)
+                  .each("end", callback);
               current = next;
             }
             //when the circle gets to the destination, reset everything and call the moveBuilding again
             else{
               orig_building = dest_building;
               console.log(delay);
+
+              callback = waitForNext;
+
+              myCircle.attr("T", 0)
+                .attr("dur", 500)
+                .attr("dx", dest_position.x)
+                .attr("dy", dest_position.y);
               myCircle
                 .transition()
                 .ease("linear")
+                .attr("T", 1)
                 .attr("cx", dest_position.x)
                 .attr("cy", dest_position.y)
-                .duration(500)
-                .each("end", function(){
-                  setTimeout(moveBuilding, delay);
-                });
+                .duration(500 * speed)
+                .each("end", callback);
             }
           }
         }
