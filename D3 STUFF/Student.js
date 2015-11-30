@@ -10,11 +10,12 @@
  var friday=classes[4];
  var saturday=classes[5];
  var sunday=classes[6];
- console.log(monday);
  var dorm=dorm;
  var gym=gym;
  var dining=favDiningHall;
  var currentLocation="";
+ if(dorm=="Off campus")
+ 	dorm="Jane Addams House";
  
  
  
@@ -22,6 +23,7 @@
  {
  
  currentLocation= schedule.shift();
+ schedule.push(currentLocation);
  return currentLocation;
  
  
@@ -31,6 +33,7 @@
  
  scope.addNewItinerary= function(x)
  {
+ 	
  	schedule.push(x);
  
  }
@@ -56,6 +59,6 @@
  
 
  //scope.addNewItinerary("four");
- console.log(schedule);
+
 
 }

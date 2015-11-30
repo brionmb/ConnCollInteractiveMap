@@ -23,33 +23,33 @@
 
           <g class="dorm">
             <!-- Plant -->
-           <rect id="Plant" num="0" x="590" y="250" width="80" height="45"/>
+           <rect id="Plant House" num="0" x="590" y="250" width="80" height="45"/>
            <!--Branford -->
-           <rect id="Branford" num="1" x="685" y="250" width="80" height="45"/>
+           <rect id="Branford House" num="1" x="685" y="250" width="80" height="45"/>
            <!--Smith-->
-           <rect id="Smith" num="2" x="800" y="250" width="40" height="75"/>
+           <rect id="Smith House" num="2" x="800" y="250" width="40" height="75"/>
            <!--Burdick-->
-           <rect id="Burdick" num="3" x="780" y="320" width="80" height="40"/>
+           <rect id="Burdick House" num="3" x="780" y="320" width="80" height="40"/>
            <!--BlackStone -->
-           <rect id="Blackstone" num="4" x="590" y="320" width ="80" height="45"/>
+           <rect id="Blackstone House" num="4" x="590" y="320" width ="80" height="45"/>
            <!--KB-->
-            <rect id="KB" num="5" x="950" y="250" width="80" height="45"/>
-           <!-- Larabee -->
-           <rect id="Larabee" num="6" x="925" y="285" width="70" height="85"/>
+            <rect id="Katharine Blunt House" num="5" x="950" y="250" width="80" height="45"/>
+           <!-- Larrabee -->
+           <rect id="Larrabee House" num="6" x="925" y="285" width="70" height="85"/>
            <!--Windham-->
-           <rect id="Windham" num="7" x="580" y="75" width="80" height="50"/>
-           <!--Lazarus-->
-           <rect id="Lazarus" num="8" x="800" y="5" width="90" height="50"/> 
+           <rect id="Windham House" num="7" x="580" y="75" width="80" height="50"/>
+           <!--Lazrus-->
+           <rect id="Lazrus" num="8" x="800" y="5" width="90" height="50"/> 
            <!--PLEX-->
            <rect id="Plex" num="9" x="1085" y="125" width="125" height="125"/>
            <!--JA-->
-           <rect id="JA" num="10" x="100" y="70" width="90" height="45" />
+           <rect id="Jane Addams House" num="10" x="100" y="70" width="90" height="45" />
            <!--FreeMan-->
            <rect id="Freeman" num="11" x="70" y="115" width="60" height="70" />
            <!--Harkness-->
-           <rect id="Harkness" num="12" x="240" y="70" width="90" height="60" />
+           <rect id="Mary Harkness House" num="12" x="240" y="70" width="90" height="60" />
            <!--Knowlton-->
-           <rect id="Knowlton" num="13" x="390" y="75" width="110" height="55" />
+           <rect id="Knowlton House" num="13" x="390" y="75" width="110" height="55" />
           </g>
 
           <g class="academicBuilding">
@@ -70,7 +70,7 @@
             <!--Fanning-->
             <rect id="Fanning" num="21" x="363" y="310" width="87" height="50"/>
             <!--New London-->
-            <rect id="NewLondon" num="22" x="467" y="250" width="75" height="115" />
+            <rect id="New London" num="22" x="467" y="250" width="75" height="115" />
             <!--Olin-->
             <rect id="Olin" num="23" x="475" y="390" width="65" height="50" />
           </g>
@@ -99,10 +99,134 @@
     <body>
     <script type="text/javascript" src="student.js"></script>   
     <script type="text/javascript" src="buildingNode.js"></script>
-    <script type="text/javascript" src="buildingHashList.js"></script>  
-    <script type="text/javascript">
 
+    <script type="text/javascript" src="buildingHashList.js"></script> 
+    <script src="http://code.jquery.com/jquery-git2.js"></script>
+  <script src="https://rawgit.com/mholt/jquery.parse/master/jquery.parse.min.js"></script>
+  <meta charset="utf-8">
+ 
+  <input type="file" id="file"  />
+  <textarea id="unparsed"></textarea>
+  <textarea id="parsed"></textarea>
+      <script type="text/javascript">
+     // console.log("YO");
       var buildingList= new BuildingHashList();
+      var infoArray="";
+
+       
+var storage = localStorage;
+var key = 'unparsed_text_file';
+
+function getFile(){
+$("#file").change(function(){
+  var file = $(this).eq(0)[0].files[0],
+    reader = new FileReader();
+    reader.onload = function(e) {
+      var text = reader.result;
+      storage.setItem(key,text);
+      parseData();
+    };
+    reader.readAsText(file);
+});
+}
+
+function parseData(){
+  $("#file").hide();
+  //parses the data
+
+  var data = storage.getItem(key);
+  
+  //splits the data by line
+  infoArray= data.split(data[68]);
+ 
+
+  //var parsed = $.parse(data);
+  //console.log(parsed);
+  $("#unparsed").val(data);
+  $("#parsed").val(JSON.stringify(parsed));
+}
+
+if(storage.getItem(key))
+  parseData();
+else
+  getFile();     
+          
+   
+      
+console.log("HERE WE ARE");
+      var studentList=[];
+    //list of building names to reference. excel format has it as "BLS", this way we can cross refference
+    //not all building names are input yet
+      var buildingNames=[];
+      buildingNames["BLS"]="Blaustein";
+      buildingNames["NLH"]="New London";
+      buildingNames["FAN"]="Fanning";
+      buildingNames["CUM"]="Cummings";
+      buildingNames["HALE"]="Hale";
+      buildingNames["WINT"]="Winthrop";
+      buildingNames["LIB"]="Library";
+      buildingNames["BIL"]="Bill";
+      buildingNames["OLIN"]="Olin";
+      
+      var tempList=[];
+      tempList[0]= new Student(["90782","90387","90495"],"Jane Addams House","yes","JA"); 
+      //tempList[0].addNewItinerary("90387");
+      //tempList[0].addNewItinerary("90495");
+      
+      var classList=[];
+//create the students
+createStudents();
+function createStudents()
+{	var x=-1;
+	var oldId="";
+	var parsedStudent="";
+	
+	//parses the array by line. If it's a new student id number create new student, else add it as a new class to prvious student
+	
+	for(i=0;i<infoArray.length;i++)
+	{
+		 parsedStudent=infoArray[i].split("	");
+		// console.log(parsedStudent[0]);
+		 if(parsedStudent[0]=="AMERICAN STUDIES ")
+		 {
+		 //this means that we're onto the classes section in the excel file
+		 	createClasses(i);
+		 	i=infoArray.length;
+		 }
+		 //currently can only check if the previous student to see if the current student is already
+		 //in the database- need to fix this in case a student is scattered around
+		else if(oldId==parsedStudent[0])
+		{
+			
+			studentList[x].addNewItinerary(parsedStudent[3]);
+		}
+		else
+		{
+			
+			oldId=parsedStudent[0];
+			x=x+1;
+			studentList[x]=new Student([parsedStudent[3]],parsedStudent[1],"yes","JA");
+		}
+	
+	}
+}  
+function createClasses(i)
+{
+	//similarly split the classes up and store them by their crn code with where they are located
+	
+	for(x=i;x<infoArray.length;x++)
+	{
+	
+		
+		parsedClass=infoArray[x].split("	");
+		if(parsedClass[4]=="90782")
+		console.log(parsedClass);
+		classList[parsedClass[4]]=parsedClass[11].split(" ")[0];
+	
+	}
+}
+
+//>>>>>>> Students now get their schedule from the cvs file
 
       //Dijkstra shortest path algorithm
       //Source: http://mcc.id.au/2004/10/dijkstra.js
@@ -172,7 +296,7 @@
       var svg = d3.select('svg');
     
       var allBuilding = d3.selectAll("rect, ellipse")[0];
-      console.log(allBuilding);
+      //console.log(allBuilding);
       
       var svg = d3.select("svg");
 
@@ -313,7 +437,7 @@
         [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z, z, z, z, z, z, z, z, z, 1, z, z ], // 39
         [z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, z, 1, z, z ], // 40
       ]
-
+	
       //go over the matrix and check the relation between nodes
       for (var i=0; i < adj_map.length; i++){
         for (var s=i+1; s < adj_map[i].length; s++){
@@ -339,7 +463,8 @@
         }
       }
     
-      console.log(adj_map);
+
+
 
       var allPathInfo = [];
       //compute the shortest paths from one vertex number to each other vertext in the graph 
@@ -347,31 +472,15 @@
         allPathInfo[i]= shortestPath(adj_map, adj_map.length, i);
       }
       //get the shortest path from one vertex to another
-      console.log(allPathInfo);
+
+ 
 
 
       var stuList = {};
 
-      function reloadStuList() {
-      
-        stuList[0] = new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-        ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Windham", "yes", "JA");
-        stuList[1] = new Student(["JA","Plant","Plex","Chapel","Cro","Blaustein",], "Harkness", "yes", "JA");
-        stuList[2] = new Student(["Plex","Cro","Blaustein","Freeman","Gym","Health"], "Plant", "yes", "JA");
-        stuList[3] = new Student(["Plex","Chapel","JA","Windham","Cro","JA","Chapel"], "Plex", "yes", "JA");
-        stuList[4] = new Student(["Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
-        stuList[5] = new Student(["Gym","JA","Freeman","Windham","Windham","Plex","Health","Cro","Blaustein","Chapel"
-        ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "JA", "yes", "JA");
-        stuList[6] = new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-        ,"Gym","JA","Freeman"], "Harkness", "yes", "JA");
-        stuList[7] = new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-        ,"Cro","Blaustein","Chapel"], "Freeman", "yes", "JA");
-        stuList[8] = new Student(["Gym","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-        ,"Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"], "Harkness", "yes", "JA");
-        stuList[9] = new Student(["Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel","Gym","JA","Freeman","Windham","Plex","Health","Cro","Blaustein","Chapel"
-        ,"Gym","JA","Freeman","Windham","Plex"], "Larabee", "yes", "JA");
+     
 
-      }
+
 
 
 
@@ -495,11 +604,11 @@
 
                     d3.selectAll("circle").remove();
 
-                    reloadStuList();
+                    
                     //create ten circle objects to move randomly at the same time
 
                     cur_epoch = (cur_epoch + 1) % 256;
-                    for(var i = 0; i < 10; i++) {
+                    for(var i = 0; i < 40; i++) {
                       moveCircle(i, cur_epoch);
                     }
 
@@ -562,7 +671,7 @@
                         }
                     }
 
-                    console.log(d3_obj.text());
+                    //console.log(d3_obj.text());
                 })
         }
 
@@ -571,10 +680,20 @@
       function moveCircle(circleNum, epoch) {
 
         //set up the color of the circle randomly
+     
         var r = Math.floor(Math.random() * 256);
         var g = Math.floor(Math.random() * 256);
         var b = Math.floor(Math.random() * 256);
-        var orig_building = buildingList.returnElementBy(stuList[circleNum].getDorm()).getLocation();
+
+      //set original building to the student's dorm based off of info stored in the student class
+      console.log(circleNum);
+      console.log(buildingList.returnElementBy(studentList[circleNum].getDorm()));
+      if(buildingList.returnElementBy(studentList[circleNum].getDorm()) == null)
+      {
+      	var orig_building = buildingList.returnElementBy("Plex").getLocation();
+      }
+      else
+        var orig_building = buildingList.returnElementBy(studentList[circleNum].getDorm()).getLocation();
         var orig_position = findMiddle(d3.select(allBuilding[orig_building]));
         var svg = d3.select("svg");
         var myCircle = svg.append("circle")
@@ -649,25 +768,43 @@
           }
 
           orig_position = findMiddle(d3.select(allBuilding[orig_building]));
-          //randomly come up another target building everytime the circle gets to the destination 
-          //var dest_building;
-          //do {
-            //dest_building = Math.floor(Math.random() * allBuilding.length);
-          //} while(dest_building == orig_building);
+         
 
-          var dest_obj = buildingList.returnElementBy(stuList[circleNum].getNextClass());
-          if (dest_obj == null) {
-
-            console.log("Student " + circleNum + " terminated");
-            return;
+ 
+      
+          
+          //get the next class by crn for the student
+          var classNext=studentList[circleNum].getNextClass();
+		  //get the building associated with the crn, and then cross reference it with how we name the buildings
+          var classRoom= buildingNames[classList[classNext]];
+          console.log(classNext);
+          console.log(classList[classNext]);
+          
+           //if the classroom did not exist (i.e. independent study, building not named yet, etc) go to dorm
+           console.log(classRoom);
+          if(classRoom==null)
+          {
+          	console.log("was null");
+          	console.log(studentList[circleNum].getDorm());
+         	 if(buildingList.returnElementBy(studentList[circleNum].getDorm()) == null)
+     			{
+      				var dest_building = buildingList.returnElementBy("Plex").getLocation();
+      			}
+      		 else
+      		  var dest_building = buildingList.returnElementBy(studentList[circleNum].getDorm()).getLocation();
+          	
           }
-
-          var dest_building = dest_obj.getLocation();
-          console.log("Destinated building No.", dest_building);
-
-          //console.log(nextClass);
+          	//otherwise go to that location
+          	else
+          	{
+          	 var dest_building=buildingList.returnElementBy(classRoom).getLocation();
+          	}
+          	console.log("OUR BUILDING");
+          	console.log(dest_building);
+   
+   
+         
           var dest_position = findMiddle(d3.select(allBuilding[dest_building]));
-
           var ideal_path = Object();
           var fastest = Infinity;
 
@@ -689,7 +826,6 @@
           var delay = 15000;
           
           var path = constructPath(allPathInfo[ideal_path.orig], ideal_path.dest);
-          console.log("The ideal path is:", path);
           var step = 0;
           var current = ideal_path.orig;
           console.log("MY CIRCLE:");
@@ -701,6 +837,16 @@
             .attr("dur", 500)
             .attr("dx", nodes[ideal_path.orig][1][0])
             .attr("dy", nodes[ideal_path.orig][1][1]);
+            
+          myCircle
+              .transition()
+              .ease("linear")
+              .attr("T", 1)
+              .duration(delay * speed)
+              .each("end", callback);
+
+			//console.log("MY CIRCLE:");
+			//console.log(myCircle);
           myCircle
             .transition()
             .ease("linear")
@@ -756,7 +902,7 @@
             //when the circle gets to the destination, reset everything and call the moveBuilding again
             else{
               orig_building = dest_building;
-              console.log(delay);
+              //console.log(delay);
 
               callback = waitForNext;
 
